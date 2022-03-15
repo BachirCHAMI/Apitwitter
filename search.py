@@ -5,7 +5,7 @@ import json
 import requests
 client = tweepy.Client(bearer_token=congiguration.beared_token , return_type=requests.Response)
 
-query = "ukraine" #input("entrer le sujet de tweet")
+query = input("entrer le sujet de tweet : ")
 
 response = client.search_recent_tweets(query=query, max_results=15)
 response_j = response.json()

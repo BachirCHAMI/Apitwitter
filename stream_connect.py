@@ -1,38 +1,31 @@
 import tweepy
 import congiguration
 import pandas as pd
+import requests
 
+streaming_client = tweepy.StreamingClient(bearer_token=congiguration.beared_token)
 
-# read configs
-"""config = configparser.ConfigParser()
-config.read('config.ini')
+"""streaming_client.add_rules(tweepy.StreamRule())
+streaming_client.filter(backfill_minutes = 1)"""
+
+class IDPrinter(tweepy.StreamingClient):
+
+    def on_data(self,data,return_type=requests.Response):
+        print(data)
+        file1 = open("C:/Users/orsys/Desktop/filestream.json", "a", encoding="utf-8")
+        file1.write(str(data))
+        file1.close()
+#return_type=requests.Response
+printer = IDPrinter(congiguration.beared_token)
+printer.add_rules(tweepy.StreamRule(["lang:fr"]), dry_run=True)
+#printer.filter(tweet_fields=["attachments","author_id","context_annotations","conversation_id","created_at","entities","geo","id","in_reply_to_user_id",
+#                                 "lang","non_public_metrics","public_metrics","organic_metrics","promoted_metrics","possibly_sensitive","referenced_tweets",
+#                                 "reply_settings","source","text","withheld"])
 """
-api_key = congiguration.api_key
-api_key_secret = congiguration.api_secret
+file1 = open("C:/Users/orsys/Desktop/filestream.json" ,"a", encoding="utf-8")
+file1.write(str(printer.json()))
+file1.close()"""
+printer.filter()
+#printer.sample()
 
-access_token = congiguration.access
-access_token_secret = congiguration.access_secret
 
-# authentication
-auth = tweepy.OAuthHandler(api_key, api_key_secret)
-auth.set_access_token(access_token, access_token_secret)
-
-api = tweepy.API(auth)
-
-user = 'veritasium'
-limit=50
-
-tweets = tweepy.Cursor(api.user_timeline, screen_name=user, count=200, tweet_mode='extended').items(limit)
-
-# tweets = api.user_timeline(screen_name=user, count=limit, tweet_mode='extended')
-
-# create DataFrame
-columns = ['User', 'Tweet']
-data = []
-
-for tweet in tweets:
-    data.append([tweet.user.screen_name, tweet.full_text])
-
-df = pd.DataFrame(data, columns=columns)
-
-print(df)
